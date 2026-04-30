@@ -93,19 +93,6 @@ td { padding:8px 12px; vertical-align:middle; }
 .td-desc { min-width:230px; }
 .td-cant { width:56px; }
 .td-unit { width:44px; }              /* columna UNIDADES más angosta */
-.cs { /* Selectro de Unidad */
-  width: 100%;
-  text-align: center;
-  font-size: .75rem;
-  padding: 2px 2px;
-  border: none;
-  background: transparent;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  cursor: pointer;
-}
-
 .td-price { width:160px; }  /* más aire para precios grandes */
 .td-sub { width:128px; text-align:right; white-space:nowrap; }
 .td-del { width:30px; text-align:center; }
@@ -113,7 +100,22 @@ td { padding:8px 12px; vertical-align:middle; }
 .ci:focus { outline:none; background:#e8f2f9; }
 .ci::placeholder { color:#c0d0dc; }
 .ci.r { text-align:right; font-family:var(--mono); }
-.cs { border:none; background:transparent; font-family:var(--font); font-size:.8rem; color:var(--muted); cursor:pointer; width:100%; }
+.cs{
+  width:100%;
+  font-family:var(--font);
+  font-size:.75rem;
+  color:var(--muted);
+  cursor:pointer;
+
+  border:none;
+  background:transparent;
+
+  padding:2px 18px 2px 2px; /* espacio para la flecha */
+  text-align:center;
+  text-align-last:center;
+
+  min-height:22px;
+}
 .cs:focus { outline:none; }
 .cell-sub { font-family:var(--mono); font-size:.875rem; font-weight:500; text-align:right; color:var(--text); }
 .btn-del { background:none; border:none; cursor:pointer; color:var(--gray3); font-size:.9rem; padding:2px; border-radius:3px; line-height:1; transition:color .15s; }
@@ -685,7 +687,8 @@ function autoResizeTA(el) {
 window.addEventListener('beforeprint', () => {
   document.querySelectorAll('textarea').forEach(ta => {
     autoResizeTA(ta);
-  })
+  });
+});
 
 function setFecha(){ const d=new Date(), dia=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'], mes=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']; document.getElementById('pres-fecha').textContent=`${dia[d.getDay()]} ${d.getDate()} de ${mes[d.getMonth()]} de ${d.getFullYear()}`; }
 function buildCode(){
