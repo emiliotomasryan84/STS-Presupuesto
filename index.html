@@ -203,7 +203,6 @@ td { padding:8px 12px; vertical-align:middle; }
   .doc { box-shadow: none; border-radius: 0; overflow: visible; }
 
   /* ── Footer fijo al fondo de CADA página ── */
-  /* @page margin-bottom:50px crea el espacio donde vive el footer */
   .doc-footer {
     position: fixed;
     bottom: 0; left: 0; right: 0;
@@ -213,17 +212,32 @@ td { padding:8px 12px; vertical-align:middle; }
     print-color-adjust: exact !important;
   }
   .doc-footer::before { display: none !important; }
-
-  /* Forzar todos los colores del footer para que impriman */
   .doc-footer * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  .doc-footer .fl-s { color: #ffffff !important; }
-  .doc-footer .fl-t { color: #4076a8 !important; }
-  .doc-footer .fi-item { color: rgba(255,255,255,.7) !important; }
-  .doc-footer .fi-icon { color: #4076a8 !important; }
-  .doc-footer .footer-logo { color: #ffffff !important; }
+  /* Colores NO blancos para que Chrome los imprima en pág 1 */
+  .doc-footer .fl-s    { color: #f0f0f0 !important; }
+  .doc-footer .fl-t    { color: #7fb3d9 !important; }
+  .doc-footer .fi-item { color: #cccccc !important; }
+  .doc-footer .fi-icon { color: #7fb3d9 !important; }
+
+  /* ── Totales: sin rebale en print ── */
+  .tot-val {
+    white-space: nowrap !important;
+    font-size: 0.82rem !important;
+  }
+  .final .tot-val {
+    font-size: 1.15rem !important;
+    white-space: nowrap !important;
+  }
+  /* Input de descuento: ocultar en print */
+  #desc-pct { display: none !important; }
+  .tot-lbl  { font-size: 0.78rem !important; }
+
+  /* Espacio para que el contenido no quede bajo el footer */
+  .totals-wrap { margin-bottom: 60px; }
+  .sig-grid    { margin-bottom: 60px; }
 
   /* Salto de página antes de Condiciones */
   .page-break { display: block; page-break-before: always; break-before: always; }
@@ -234,10 +248,6 @@ td { padding:8px 12px; vertical-align:middle; }
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-
-  /* Espacio para que el contenido no quede BAJO el footer */
-  .totals-wrap { margin-bottom: 60px; }
-  .sig-grid    { margin-bottom: 60px; }
 
   /* Color fixes */
   .doc-header, .p2-header, thead th, .tot-row.final,
@@ -397,7 +407,7 @@ input[type=number] { -moz-appearance:textfield; }
               style="width:40px;padding:2px 5px;border-radius:4px;border:1.5px solid var(--gray3);
                      background:var(--gray);color:var(--text);font-size:.78rem;
                      font-family:var(--mono);text-align:center">
-            <span style="font-size:.72rem;color:var(--muted)">%</span>
+            <span style="font-size:.72rem;color:var(--muted)">%</span><span id="desc-pct-print" style="display:none;font-size:.72rem;font-family:var(--mono);color:var(--muted)"></span>
           </span>
           <span class="tot-val" style="color:#e05c5c" id="tot-desc">-$ 0,00</span>
         </div>
@@ -553,13 +563,14 @@ function updMon(){
   recalc();
 }
 function tglIVA(){ conIVA=document.getElementById('cb-iva').checked; document.getElementById('tgl-iva').classList.toggle('active',conIVA); document.getElementById('iva-row').classList.toggle('visible',conIVA); recalc(); }
+function syncDescPrint(){ const v=document.getElementById('desc-pct').value||'10'; const sp=document.getElementById('desc-pct-print'); if(sp) sp.textContent=v; }
 function tglDesc(){ const on=document.getElementById('cb-desc').checked; document.getElementById('tgl-desc').classList.toggle('active',on); document.getElementById('desc-row').classList.toggle('visible',on); recalc(); }
 function addRow(){ rowCount++; const id=rowCount, tr=document.createElement('tr'); tr.id='row-'+id; tr.innerHTML=`<td class="td-num">${id}</td><td class="td-desc"><input class="ci" type="text" placeholder="Descripción del ítem, trabajo o material..."></td><td class="td-cant"><input class="ci r" type="number" value="1" min="0" step="any" oninput="recalc()"></td><td class="td-unit"><select class="cs"><option>u</option><option>hs</option><option>m</option><option>m²</option><option>gl</option><option>kit</option><option>mes</option></select></td><td class="td-price"><input class="ci r" type="number" placeholder="0,00" min="0" step="any" oninput="recalc()" style="-webkit-appearance:none;-moz-appearance:textfield;width:100%"></td><td class="td-sub"><span class="cell-sub" id="sub-${id}">—</span></td><td class="td-del"><button class="btn-del" onclick="delRow(${id})">✕</button></td>`; document.getElementById('items-body').appendChild(tr);
   recalc(); }
 function delRow(id){ document.getElementById('row-'+id)?.remove(); renumber(); recalc(); }
 function renumber(){ document.querySelectorAll('#items-body tr').forEach((tr,i)=>{ const n=tr.querySelector('.td-num'); if(n) n.textContent=i+1; }); }
 function fmt(n){ return moneda+' '+n.toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
-function recalc(){
+function recalc(){ syncDescPrint();
   let sub = 0;
   document.querySelectorAll('#items-body tr').forEach(tr => {
     const n = tr.querySelectorAll('input[type="number"]');
