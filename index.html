@@ -328,7 +328,7 @@ textarea {
     print-color-adjust: exact;
   }
 
-  textarea { overflow: visible !important; }
+  textarea { overflow: visible !important; -webkit-appearance: none !important;}
 
   input, textarea, select {
     border: none !important;
@@ -680,6 +680,13 @@ function autoResizeTA(el) {
   el.style.height = 'auto';
   el.style.height = (el.scrollHeight + 2) + 'px';
 }
+
+// ✅ REAJUSTAR ALTURA JUSTO ANTES DE IMPRIMIR
+window.addEventListener('beforeprint', () => {
+  document.querySelectorAll('textarea').forEach(ta => {
+    autoResizeTA(ta);
+  })
+
 function setFecha(){ const d=new Date(), dia=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'], mes=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']; document.getElementById('pres-fecha').textContent=`${dia[d.getDay()]} ${d.getDate()} de ${mes[d.getMonth()]} de ${d.getFullYear()}`; }
 function buildCode(){
   const tipo    = 'OTC';
