@@ -624,7 +624,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   if (cond[0] && !cond[0].value) {
     cond[0].value =
   `Anticipo 70% y saldo contra entrega y aceptación de obra. 
-
 Pago en efectivo o transferencia bancaria.
 Alias: stsolutions.ar`;
   }
@@ -632,21 +631,18 @@ Alias: stsolutions.ar`;
   if (cond[1] && !cond[1].value) {
     cond[1].value =
   `Presupuesto válido por 7 días.
-
 Se estima una obra de un (1) día, considerando que la misma se realizará sin ningún tipo de interrupción.`;
   }
   // ✅ Valor por defecto: Garantía
   if (cond[2] && !cond[2].value) {
     cond[2].value = 
   `6 meses. Todos los trabajos realizados conforme según la presente Oferta Técnica Comercial tienen garantía; la misma no cubre fallas provenientes del maltrato o agentes externos tales como sobretensiones, cortocircuitos, descargas atmosféricas, inundaciones, entre otros.
-
 Cualquier desperfecto técnico deberá ser comunicado a la brevedad y dentro del período de garantía. La intervención o reparación del desperfecto por parte de personal no calificado hará caducar automáticamente la presente garantía.`;
   }
   // ✅ Valor por defecto: Materiales incluidos
   if (cond[3] && !cond[3].value) {
     cond[3].value =
   `La obra se considera del tipo “llave en mano”. Incluye ingeniería, mano de obra, materiales puestos en obra y todos los consumibles necesarios para el montaje, instalación y puesta en marcha del sistema.
-
 Marcas instaladas: Home Assistant / Sonoff / Tuya / Hikvision`;
   }
 
@@ -654,11 +650,10 @@ Marcas instaladas: Home Assistant / Sonoff / Tuya / Hikvision`;
   const obs = document.querySelector('.notes-val');
   if (obs && !obs.value) {
     obs.value =
-  `No se incluye en la presente OTC:
+  `El servicio de Internet del inmueble deberá funcionar correctamente.
+  No se incluye en la presente OTC:
   • Obras civiles ni medios de elevación para trabajos en altura.
-  • Se considera que el trabajo será sobre canalizaciones y bocas existentes, por lo que no están contempladas en la presente cotización.
-
-El servicio de Internet del inmueble deberá funcionar correctamente.`;
+  • Se considera que el trabajo será sobre canalizaciones y bocas existentes, por lo que no están contempladas en la presente cotización.`;
   }
 
   // Pre-fill year with current 2-digit year
