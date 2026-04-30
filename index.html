@@ -100,21 +100,17 @@ td { padding:8px 12px; vertical-align:middle; }
 .ci:focus { outline:none; background:#e8f2f9; }
 .ci::placeholder { color:#c0d0dc; }
 .ci.r { text-align:right; font-family:var(--mono); }
-.cs{
-  width:100%;
-  font-family:var(--font);
-  font-size:.75rem;
-  color:var(--muted);
-  cursor:pointer;
-
-  border:none;
-  background:transparent;
-
-  padding:2px 18px 2px 2px; /* espacio para la flecha */
-  text-align:center;
-  text-align-last:center;
-
-  min-height:22px;
+.cs { /* Selectro de Unidad */
+  width: 100%;
+  text-align: center;
+  font-size: .75rem;
+  padding: 2px 2px;
+  border: none;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
 }
 .cs:focus { outline:none; }
 .cell-sub { font-family:var(--mono); font-size:.875rem; font-weight:500; text-align:right; color:var(--text); }
