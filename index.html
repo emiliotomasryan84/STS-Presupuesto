@@ -241,7 +241,16 @@ textarea {
 }
 
 
-@media print {
+.ta-print{
+  display:none;
+  white-space:pre-wrap;
+  font-family:var(--font);
+  font-size:.84rem;
+  line-height:1.55;
+  color:var(--text);
+}
+  
+@media print{
 
   @page { size: A4; margin: 0 0 50px 0; }
 
@@ -326,7 +335,8 @@ textarea {
     print-color-adjust: exact;
   }
 
-  textarea { overflow: visible !important; -webkit-appearance: none !important;}
+  .ta-print{ display:block !important; }
+  textarea { display:none !important; overflow: visible !important; -webkit-appearance: none !important;}
 
   input, textarea, select {
     border: none !important;
@@ -679,7 +689,24 @@ window.addEventListener('beforeprint', () => {
   document.querySelectorAll('textarea').forEach(ta => {
     autoResizeTA(ta);
   });
+  ensurePrintMirrors();
 });
+
+
+function ensurePrintMirrors(){
+  document.querySelectorAll('textarea').forEach(ta=>{
+    if(ta.nextElementSibling?.classList.contains('ta-print')) return;
+
+    const mirror=document.createElement('div');
+    mirror.className='ta-print';
+    mirror.textContent=ta.value||ta.placeholder||'';
+    ta.after(mirror);
+
+    ta.addEventListener('input',()=>{
+      mirror.textContent=ta.value||ta.placeholder||'';
+    });
+  });
+}
 
 function setFecha(){ const d=new Date(), dia=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'], mes=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']; document.getElementById('pres-fecha').textContent=`${dia[d.getDay()]} ${d.getDate()} de ${mes[d.getMonth()]} de ${d.getFullYear()}`; }
 function buildCode(){
