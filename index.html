@@ -91,9 +91,22 @@ tbody tr:hover { background:#f6f9fc; }
 td { padding:8px 12px; vertical-align:middle; }
 .td-num { font-family:var(--mono); font-size:.7rem; color:var(--muted); width:26px; text-align:center; }
 .td-desc { min-width:230px; }
-.td-cant { width:66px; }
-.td-unit { width:74px; }
-.td-price { width:120px; }
+.td-cant { width:56px; }
+.td-unit { width:44px; }              /* columna UNIDADES más angosta */
+.cs { /* Selectro de Unidad */
+  width: 100%;
+  text-align: center;
+  font-size: .75rem;
+  padding: 2px 2px;
+  border: none;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+
+.td-price { width:160px; }  /* más aire para precios grandes */
 .td-sub { width:128px; text-align:right; white-space:nowrap; }
 .td-del { width:30px; text-align:center; }
 .ci { border:none; background:transparent; font-family:var(--font); font-size:.875rem; color:var(--text); width:100%; padding:2px 4px; border-radius:4px; transition:background .15s; }
@@ -108,12 +121,34 @@ td { padding:8px 12px; vertical-align:middle; }
 .btn-add { display:flex; align-items:center; gap:6px; margin-top:10px; padding:8px 14px; background:var(--gray); border:1.5px dashed var(--gray3); border-radius:6px; font-family:var(--font); font-size:.82rem; color:var(--muted); cursor:pointer; transition:all .15s; }
 .btn-add:hover { background:#e6f0f8; border-color:var(--sts-3); color:var(--sts-2); }
 .totals-wrap { display:flex; justify-content:flex-end; margin-bottom:26px; }
-.totals-box { width:288px; border:1px solid var(--gray2); border-radius:8px; overflow:hidden; }
+/* Pantalla HTML*/
+.totals-box {
+  width: 360px;        
+  max-width: 100%;
+  border: 1px solid var(--gray2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .tot-row { display:flex; justify-content:space-between; align-items:center; padding:10px 18px; border-bottom:1px solid var(--gray2); font-size:.875rem; }
 .tot-row:last-child { border-bottom:none; }
 .tot-row.final { background:var(--sts-1); color:white; padding:13px 18px; }
 .tot-lbl { color:var(--muted); font-size:.78rem; font-weight:600; }
-.tot-val { font-family:var(--mono); font-weight:500; }
+
+/* Valores de totales: formato seguro */
+.tot-val {
+  font-family: var(--mono);
+  font-weight: 500;
+  display: inline-block;
+  text-align: right;
+  white-space: nowrap;
+}
+
+
+/* Total final (más ancho) */
+.tot-row.final .tot-val {
+  min-width: 200px;
+}
 .final .tot-lbl { font-size:.7rem; font-weight:700; color:rgba(255,255,255,.5); text-transform:uppercase; letter-spacing:2px; }
 .final .tot-val { font-size:1.55rem; font-weight:900; color:var(--sts-3); font-family:var(--font); }
 .iva-row { display:none; }
@@ -193,6 +228,21 @@ td { padding:8px 12px; vertical-align:middle; }
   letter-spacing: 1px;
 }
 
+.sec-lbl::after { /* Forzar a imprimir la líneas grises */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+
+/* Textareas sin scroll, alto automático */
+textarea {
+  overflow: hidden;
+  resize: none;
+  padding-left: 6px;
+  white-space: pre-wrap;
+}
+
+
 @media print {
 
   @page { size: A4; margin: 0 0 50px 0; }
@@ -222,10 +272,26 @@ td { padding:8px 12px; vertical-align:middle; }
   .doc-footer .fi-item { color: #cccccc !important; }
   .doc-footer .fi-icon { color: #7fb3d9 !important; }
 
-  /* ── Totales: sin rebale en print ── */
+
+  /* --- Totales: layout estable en PDF --- */
+  .totals-wrap {
+    display: block !important;
+    margin-top: 20px;
+    break-inside: avoid;
+  }
+
+  .totals-box {
+    width: 48% !important;      /* escala relativa */
+    max-width: 9.5cm !important; /* límite físico */
+    margin-left: auto !important;
+    break-inside: avoid;
+  }
+
+
+  /* Valores: nunca rebasar */
   .tot-val {
     white-space: nowrap !important;
-    font-size: 0.82rem !important;
+    text-align: right !important;
   }
   .final .tot-val {
     font-size: 1.15rem !important;
@@ -233,10 +299,16 @@ td { padding:8px 12px; vertical-align:middle; }
   }
   /* Input de descuento: ocultar en print */
   #desc-pct { display: none !important; }
-  .tot-lbl  { font-size: 0.78rem !important; }
-
-  /* Espacio para que el contenido no quede bajo el footer */
-  .totals-wrap { margin-bottom: 60px; }
+  .tot-lbl  { font-size: 0.78rem !important;
+  }
+  /* Mostrar porcentaje de descuento en impresión */
+  #desc-pct-print {
+  display: inline !important;
+  }
+  /* Mostrar porcentaje de descuento en html */
+  .pct-screen {
+    display: none !important;
+  }
   .sig-grid    { margin-bottom: 60px; }
 
   /* Salto de página antes de Condiciones */
@@ -256,11 +328,33 @@ td { padding:8px 12px; vertical-align:middle; }
     print-color-adjust: exact;
   }
 
+  textarea { overflow: visible !important; }
+
   input, textarea, select {
     border: none !important;
     background: transparent !important;
     -webkit-appearance: none;
   }
+  
+  .doc-footer .fi-item,
+  .doc-footer .footer-logo,
+  .doc-footer .fl-s,
+  .doc-footer .fl-t {
+    color: #44545f !important; /* gris más oscuro, legible del footer si se imprime sin fondo */
+  }
+  
+  .doc-footer .fi-icon {
+    color: #44545f !important; /* refinar íconos del footer al imprimir */
+  }
+
+  /* Volver a mostrar líneas de campos de cliente/proyecto */
+  .fg-val {
+    border-bottom: 1.2px solid #b8ccd8 !important;
+    padding-bottom: 2px;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
 }
 
 input[type=number]::-webkit-outer-spin-button,
@@ -370,7 +464,7 @@ input[type=number] { -moz-appearance:textfield; }
 
     <div class="sec-lbl" style="margin-top:2px">Proyecto</div>
     <div class="project-block">
-      <input class="proj-title" type="text" placeholder="Título · Ej: Sistema de videovigilancia IP — Edificio Central">
+      <input class="proj-title" id="proj-title" type="text" placeholder="Título · Ej: Sistema de videovigilancia IP — Edificio Central" oninput="buildCode()">
       <textarea class="proj-desc" rows="2" placeholder="Descripción breve del alcance del trabajo..."></textarea>
     </div>
 
@@ -382,7 +476,7 @@ input[type=number] { -moz-appearance:textfield; }
             <th class="td-num">#</th>
             <th class="td-desc">Descripción</th>
             <th class="td-cant">Cant.</th>
-            <th class="td-unit">Unidad</th>
+            <th class="td-unit">Un.</th>
             <th class="td-price">Precio unit. <span id="th-mon-lbl" style="opacity:.5;font-weight:400">($)</span></th>
             <th class="td-sub">Subtotal</th>
             <th class="td-del"></th>
@@ -407,7 +501,8 @@ input[type=number] { -moz-appearance:textfield; }
               style="width:40px;padding:2px 5px;border-radius:4px;border:1.5px solid var(--gray3);
                      background:var(--gray);color:var(--text);font-size:.78rem;
                      font-family:var(--mono);text-align:center">
-            <span style="font-size:.72rem;color:var(--muted)">%</span><span id="desc-pct-print" style="display:none;font-size:.72rem;font-family:var(--mono);color:var(--muted)"></span>
+            <span class="pct-screen" style="font-size:.72rem;color:var(--muted)">%</span>
+            <span id="desc-pct-print" style="display:none;font-size:.72rem;font-family:var(--mono);color:var(--muted)"></span>
           </span>
           <span class="tot-val" style="color:#e05c5c" id="tot-desc">-$ 0,00</span>
         </div>
@@ -525,12 +620,63 @@ let moneda='$', conIVA=false, rowCount=0;
 document.addEventListener('DOMContentLoaded',()=>{
   setFecha();
   addRow(); addRow(); addRow();
- 
+
+  const cond = document.querySelectorAll('.cond-grid .cond-val');
+  // ✅ Valor por defecto: Condiciones de pago
+  if (cond[0] && !cond[0].value) {
+    cond[0].value =
+  `Anticipo 70% y saldo contra entrega y aceptación de obra. 
+Pago en efectivo o transferencia bancaria.
+Alias: stsolutions.ar`;
+  }
+  // ✅ Valor por defecto: Vigencia y plazo de obra
+  if (cond[1] && !cond[1].value) {
+    cond[1].value =
+  `Presupuesto válido por 7 días.
+Se estima una obra de un (1) día, considerando que la misma se realizará sin ningún tipo de interrupción.`;
+  }
+  // ✅ Valor por defecto: Garantía
+  if (cond[2] && !cond[2].value) {
+    cond[2].value = 
+  `6 meses. Todos los trabajos realizados conforme según la presente Oferta Técnica Comercial tienen garantía; la misma no cubre fallas provenientes del maltrato o agentes externos tales como sobretensiones, cortocircuitos, descargas atmosféricas, inundaciones, entre otros.
+Cualquier desperfecto técnico deberá ser comunicado a la brevedad y dentro del período de garantía.
+La intervención o reparación del desperfecto por parte de personal no calificado hará caducar automáticamente la presente garantía.`;
+  }
+  // ✅ Valor por defecto: Materiales incluidos
+  if (cond[3] && !cond[3].value) {
+    cond[3].value =
+  `La obra se considera del tipo “llave en mano”. Incluye ingeniería, mano de obra, materiales puestos en obra y todos los consumibles necesarios para el montaje, instalación y puesta en marcha del sistema.
+Marcas instaladas: Tuya / Hikvision`;
+  }
+
+  // ✅ Valor por defecto: Observaciones técnicas
+  const obs = document.querySelector('.notes-val');
+  if (obs && !obs.value) {
+    obs.value =
+  `No se incluye en la presente OTC:
+  • Obras civiles ni medios de elevación para trabajos en altura.
+  • Se considera que el trabajo será sobre canalizaciones y bocas existentes, por lo que no están contempladas en la presente cotización.
+
+El servicio de Internet del inmueble deberá funcionar correctamente.`;
+  }
+
   // Pre-fill year with current 2-digit year
   const yy = String(new Date().getFullYear()).slice(-2);
   document.getElementById('tb-anio').value = yy;
   buildCode();
+
+  // ✅ Auto-ajustar altura de todos los textareas (sin scroll)
+  document.querySelectorAll('textarea').forEach(ta => {
+    autoResizeTA(ta);
+    ta.addEventListener('input', () => autoResizeTA(ta));
+  });
 });
+function autoResizeTA(el) {
+  el.style.overflow = 'hidden';
+  el.style.resize = 'none';
+  el.style.height = 'auto';
+  el.style.height = (el.scrollHeight + 2) + 'px';
+}
 function setFecha(){ const d=new Date(), dia=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'], mes=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']; document.getElementById('pres-fecha').textContent=`${dia[d.getDay()]} ${d.getDate()} de ${mes[d.getMonth()]} de ${d.getFullYear()}`; }
 function buildCode(){
   const tipo    = 'OTC';
@@ -547,8 +693,14 @@ function buildCode(){
   document.getElementById('pres-num').textContent = completo;
   document.getElementById('pres-tipo-lbl').textContent = 'Oferta Técnica Económica';
 
-  // Set document title → PDF filename suggestion
-  document.title = codigo + ' — Smart Tech Solutions';
+  
+  // Set document title → PDF filename suggestion (incluye OTC + título proyecto)
+  const rawTitle = (document.getElementById('proj-title')?.value || '').trim();
+  const safeTitle = rawTitle
+    .replace(/[\\\/:*?"<>|]+/g, '')   // limpia caracteres inválidos para nombre de archivo
+    .replace(/\s+/g, ' ');           // colapsa espacios
+
+  document.title = `${completo} - ${safeTitle || 'Smart Tech Solutions'}.pdf`;
   const p2 = document.getElementById('p2-code');
   if (p2) p2.textContent = completo;
 }
@@ -560,12 +712,35 @@ function updMon(){
   const lbl = document.getElementById('th-mon-lbl');
   if (lbl) lbl.textContent = '(' + sym + ')';
 
+  document.querySelectorAll('.unit-cur').forEach(el=>{
+    el.textContent = moneda === 'USD' ? 'USD' : '$';
+  });
+
   recalc();
 }
 function tglIVA(){ conIVA=document.getElementById('cb-iva').checked; document.getElementById('tgl-iva').classList.toggle('active',conIVA); document.getElementById('iva-row').classList.toggle('visible',conIVA); recalc(); }
-function syncDescPrint(){ const v=document.getElementById('desc-pct').value||'10'; const sp=document.getElementById('desc-pct-print'); if(sp) sp.textContent=v; }
+function syncDescPrint(){
+  const v = document.getElementById('desc-pct')?.value || '0';
+  const sp = document.getElementById('desc-pct-print');
+  if (sp && v > 0) sp.textContent = v + ' %';
+}
 function tglDesc(){ const on=document.getElementById('cb-desc').checked; document.getElementById('tgl-desc').classList.toggle('active',on); document.getElementById('desc-row').classList.toggle('visible',on); recalc(); }
-function addRow(){ rowCount++; const id=rowCount, tr=document.createElement('tr'); tr.id='row-'+id; tr.innerHTML=`<td class="td-num">${id}</td><td class="td-desc"><input class="ci" type="text" placeholder="Descripción del ítem, trabajo o material..."></td><td class="td-cant"><input class="ci r" type="number" value="1" min="0" step="any" oninput="recalc()"></td><td class="td-unit"><select class="cs"><option>u</option><option>hs</option><option>m</option><option>m²</option><option>gl</option><option>kit</option><option>mes</option></select></td><td class="td-price"><input class="ci r" type="number" placeholder="0,00" min="0" step="any" oninput="recalc()" style="-webkit-appearance:none;-moz-appearance:textfield;width:100%"></td><td class="td-sub"><span class="cell-sub" id="sub-${id}">—</span></td><td class="td-del"><button class="btn-del" onclick="delRow(${id})">✕</button></td>`; document.getElementById('items-body').appendChild(tr);
+function addRow(){ rowCount++; const id=rowCount, tr=document.createElement('tr'); tr.id='row-'+id; tr.innerHTML=`<td class="td-num">${id}</td><td class="td-desc"><input class="ci" type="text" placeholder="Descripción del ítem, trabajo o material..."></td><td class="td-cant"><input class="ci r" type="number" value="1" min="0" step="any" oninput="recalc()"></td><td class="td-unit"><select class="cs"><option>UN</option><option>hs</option><option>m</option><option>m²</option><option>gl</option><option>kit</option><option>mes</option></select></td>
+<td class="td-price" style="position:relative">
+  <span class="unit-cur" style="
+    position:absolute;
+    left:8px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:.75rem;
+    color:var(--muted);
+    pointer-events:none;
+    font-family:var(--mono);
+  ">${moneda === 'USD' ? 'USD' : '$'}</span>
+  <input class="ci r" type="number" placeholder="0,00" min="0" step="any" oninput="recalc()"
+    style="-webkit-appearance:none;-moz-appearance:textfield;width:100%;padding-left:32px">
+</td>
+<td class="td-sub"><span class="cell-sub" id="sub-${id}">—</span></td><td class="td-del"><button class="btn-del" onclick="delRow(${id})">✕</button></td>`; document.getElementById('items-body').appendChild(tr);
   recalc(); }
 function delRow(id){ document.getElementById('row-'+id)?.remove(); renumber(); recalc(); }
 function renumber(){ document.querySelectorAll('#items-body tr').forEach((tr,i)=>{ const n=tr.querySelector('.td-num'); if(n) n.textContent=i+1; }); }
